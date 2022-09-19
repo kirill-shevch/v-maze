@@ -17,22 +17,27 @@ public class MazeMovement : MonoBehaviour
         if(rightHandDevices.Count == 1)
         {
             device = rightHandDevices[0];
+            Debug.Log("device found!");
+        } else
+        {
+            Debug.Log("device not found");
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetAxis("Mouse X") != 0) {
+        /*if(Input.GetAxis("Mouse X") != 0) {
            gameObject.transform.RotateAround(playerCamera.transform.position, Vector3.up, 5 * Input.GetAxis("Mouse X"));
         }
 
         if(Input.GetAxis("Mouse Y") != 0) {
            gameObject.transform.RotateAround(playerCamera.transform.position, Vector3.left, 5 * Input.GetAxis("Mouse Y"));
-        }
+        }*/
         Vector2 axisValue;
 
         if(device.TryGetFeatureValue(CommonUsages.secondary2DAxis, out axisValue)) {
+            Debug.Log(axisValue[0] + " " + axisValue[1]);
             gameObject.transform.RotateAround(playerCamera.transform.position, Vector3.up, axisValue[0]);
             gameObject.transform.RotateAround(playerCamera.transform.position, Vector3.left, axisValue[1]);
         }
