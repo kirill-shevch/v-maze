@@ -64,7 +64,6 @@ public class WorldScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) {
         if(other.gameObject.tag == "End") {
-            GUI.Label(new Rect (10, 10, 100, 20), "You have reached the end!");
             gameParams.curLevel++;
         }
     }
