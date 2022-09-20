@@ -6,6 +6,7 @@ using UnityEngine;
 public class WorldScript : MonoBehaviour
 {
     GameObject user;
+    public GameParams gameParams;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +36,19 @@ public class WorldScript : MonoBehaviour
                         rigidbody.isKinematic = false;
                         rigidbody.constraints = RigidbodyConstraints.FreezeAll;
                         cubeObject.AddComponent<BoxCollider>();
+                    } else if (i == 1 && j == 2 && h == 4) {
+                        var endHitbox = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        endHitbox.transform.position = new Vector3(i, j, h);
+                        endHitbox.transform.parent = mazeObject.transform;
+                        // Remove the color in the future
+                        endHitbox.GetComponent<Renderer>().material.color = new Color(255, 0, 0);
+                        var rigidbody = endHitbox.AddComponent<Rigidbody>();
+                        rigidbody.useGravity = false;
+                        rigidbody.isKinematic = false;
+                        rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                        var boxCollider = endHitbox.AddComponent<BoxCollider>();
+                        boxCollider.isTrigger = true;
+                        endHitbox.tag = "End";
                     }
                 }
             }
@@ -46,6 +60,13 @@ public class WorldScript : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if(other.gameObject.tag == "End") {
+            GUI.Label(new Rect (10, 10, 100, 20), "You have reached the end!");
+            gameParams.curLevel++;
+        }
     }
 
     private bool[,,] GetMaze()
