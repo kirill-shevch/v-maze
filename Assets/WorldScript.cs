@@ -5,9 +5,13 @@ using UnityEngine;
 
 public class WorldScript : MonoBehaviour
 {
+    GameObject user;
+
     // Start is called before the first frame update
     void Start()
     {
+        user = GameObject.Find("XR Origin");
+        var entrance = GetEntrance();
         var maze = GetMaze();
         var middleCoordinates = new Tuple<float, float, float>((float)maze.GetLength(0) / 2, (float)maze.GetLength(1) / 2, (float)maze.GetLength(2) / 2);
         var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1"); // Assets/Resources/Prefabs/prefab1.FBX
@@ -26,11 +30,16 @@ public class WorldScript : MonoBehaviour
                     {
                         var cubeObject = (GameObject)Instantiate(cubePrefab, new Vector3(i, j, h), Quaternion.identity);
                         cubeObject.transform.parent = mazeObject.transform;
+                        var rigidbody = cubeObject.AddComponent<Rigidbody>();
+                        rigidbody.useGravity = false;
+                        rigidbody.isKinematic = false;
+                        rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                        cubeObject.AddComponent<BoxCollider>();
                     }
                 }
             }
         }
-
+        user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
     }
 
     // Update is called once per frame
@@ -59,5 +68,15 @@ public class WorldScript : MonoBehaviour
         maze[1,2,3] = false;
         maze[1,2,4] = false;
         return maze;
+    }
+
+    private Tuple<int, int, int> GetEntrance()
+    {
+        return new Tuple<int, int, int>( 1, 1, 0 );
+    }
+
+    private Tuple<int, int, int> GetExit()
+    {
+        return new Tuple<int, int, int>(1, 1, 0);
     }
 }

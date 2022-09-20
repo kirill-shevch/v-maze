@@ -15,7 +15,7 @@ public class UserControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        maze = GameObject.Find("maze001");
+        maze = GameObject.Find("maze");
         user = GameObject.Find("XR Origin");
     }
 
@@ -33,7 +33,6 @@ public class UserControl : MonoBehaviour
         {
             rdevice.TryGetFeatureValue(CommonUsages.primary2DAxis, out primary2DAxis);
             head.TryGetFeatureValue(CommonUsages.deviceRotation, out headRotation);
-            Debug.Log($" y:{headRotation.eulerAngles.y}");
             if (primary2DAxis.y != 0)
             {
                 maze.transform.RotateAround(user.transform.position, new Vector3(
@@ -57,6 +56,10 @@ public class UserControl : MonoBehaviour
                 InputDevices.GetDevicesAtXRNode(UnityEngine.XR.XRNode.Head, headDevices);
                 head = headDevices.FirstOrDefault();
             }
+        }
+        if (maze == null)
+        {
+            maze = GameObject.Find("maze");
         }
     }
 }
