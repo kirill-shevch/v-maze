@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WorldScript : MonoBehaviour
 {
@@ -53,7 +54,10 @@ public class WorldScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (user.transform.position.y < -150)
+        {
+            SceneManager.LoadScene("MovementScene");
+        }
     }
 
     private bool[,,] GetMaze()
