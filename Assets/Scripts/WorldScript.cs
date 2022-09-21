@@ -6,6 +6,8 @@ public class WorldScript : MonoBehaviour
 {
     GameObject user;
 
+    [SerializeField] private Boolean isClosed = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -13,10 +15,12 @@ public class WorldScript : MonoBehaviour
         var entrance = GetEntrance();
         var exit = GetExit();
         var maze = GetMaze();
-        var middleCoordinates = new Tuple<float, float, float>((float)maze.GetLength(0) / 2, (float)maze.GetLength(1) / 2, (float)maze.GetLength(2) / 2);
-        var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1"); 
+        var middleCoordinates = new Tuple<float, float, float>((float)maze.GetLength(0) / 2,
+            (float)maze.GetLength(1) / 2, (float)maze.GetLength(2) / 2);
+        var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1");
         var mazeObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        mazeObject.transform.position = new Vector3(middleCoordinates.Item1, middleCoordinates.Item2, middleCoordinates.Item3);
+        mazeObject.transform.position =
+            new Vector3(middleCoordinates.Item1, middleCoordinates.Item2, middleCoordinates.Item3);
         mazeObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         mazeObject.name = "maze";
 
@@ -33,7 +37,7 @@ public class WorldScript : MonoBehaviour
                 }
             }
         }
-       
+
         SpawnCube(entrance.Item1, entrance.Item2, entrance.Item3, mazeObject, cubePrefab);
         SpawnCube(exit.Item1, exit.Item2, exit.Item3, mazeObject, cubePrefab);
 
@@ -49,6 +53,7 @@ public class WorldScript : MonoBehaviour
         collider.tag = "End";
 
         user.transform.position = new Vector3(entrance.Item1, entrance.Item2 + 1, entrance.Item3);
+        // user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
     }
 
     // Update is called once per frame
@@ -69,20 +74,29 @@ public class WorldScript : MonoBehaviour
             {
                 for (int h = 0; h < maze.GetLength(2); h++)
                 {
-                    maze[i,j,h] = true;
+                    maze[i, j, h] = true;
                 }
             }
         }
-        maze[1,1,0] = false;
-        maze[1,1,1] = false;
-        maze[1,1,2] = false;
-        maze[1,2,2] = false;
-        maze[1,2,3] = false;
-        maze[1,2,4] = false;
+
+        maze[1, 1, 0] = false;
+        maze[1, 1, 1] = false;
+        maze[1, 1, 2] = false;
+        maze[1, 2, 2] = false;
+        maze[1, 2, 3] = false;
+        maze[1, 2, 4] = false;
+
+        // Optionally close the entrance, exist to simulate lightning in closed env.
+        // if (!isClosed)
+        // {
+        //     maze[1, 1, 0] = false;
+        //     maze[1, 2, 4] = false;
+        // }
+
         return maze;
     }
 
-    private GameObject SpawnCube(int x, int y, int z, GameObject mazeObject, UnityEngine.Object cubePrefab) 
+    private GameObject SpawnCube(int x, int y, int z, GameObject mazeObject, UnityEngine.Object cubePrefab)
     {
         var cubeObject = (GameObject)Instantiate(cubePrefab, new Vector3(x, y, z), Quaternion.identity);
         cubeObject.transform.parent = mazeObject.transform;
@@ -96,7 +110,7 @@ public class WorldScript : MonoBehaviour
 
     private Tuple<int, int, int> GetEntrance()
     {
-        return new Tuple<int, int, int>( 1, 0, -1 );
+        return new Tuple<int, int, int>(1, 0, -1);
     }
 
     private Tuple<int, int, int> GetExit()
