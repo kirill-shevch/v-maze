@@ -11,6 +11,8 @@ public class UserControl : MonoBehaviour
     Quaternion headRotation;
     GameObject maze;
     GameObject user;
+    bool endTriggered = false;
+    float timer = 3f;
 
     // Start is called before the first frame update
     void Start()
@@ -22,12 +24,14 @@ public class UserControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        //maze.transform.RotateAround(user.transform.position, new Vector3(
-        //    Mathf.Cos(user.transform.rotation.eulerAngles.y * Mathf.Deg2Rad), 
-        //    0,
-        //    -Mathf.Sin(user.transform.rotation.eulerAngles.y * Mathf.Deg2Rad)), 
-        //    0.1f);
+        if (endTriggered)
+        {
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+            {
+                Application.Quit();
+            }
+        }
 
         if (rdevice.isValid && head.isValid)
         {
@@ -60,6 +64,17 @@ public class UserControl : MonoBehaviour
         if (maze == null)
         {
             maze = GameObject.Find("maze");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "End")
+        {
+            endTriggered = true;
+            other.enabled = false;
+            other.gameObject.SetActive(false);
+            user.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         }
     }
 }
