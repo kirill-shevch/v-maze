@@ -1,21 +1,19 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldScript : MonoBehaviour
 {
     GameObject user;
-    public GameParams gameParams;
 
     // Start is called before the first frame update
     void Start()
     {
         user = GameObject.Find("XR Origin");
         var entrance = GetEntrance();
+        var exit = GetExit();
         var maze = GetMaze();
         var middleCoordinates = new Tuple<float, float, float>((float)maze.GetLength(0) / 2, (float)maze.GetLength(1) / 2, (float)maze.GetLength(2) / 2);
-        var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1"); // Assets/Resources/Prefabs/prefab1.FBX
+        var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1"); 
         var mazeObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         mazeObject.transform.position = new Vector3(middleCoordinates.Item1, middleCoordinates.Item2, middleCoordinates.Item3);
         mazeObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
@@ -29,43 +27,33 @@ public class WorldScript : MonoBehaviour
                 {
                     if (maze[i, j, h])
                     {
-                        var cubeObject = (GameObject)Instantiate(cubePrefab, new Vector3(i, j, h), Quaternion.identity);
-                        cubeObject.transform.parent = mazeObject.transform;
-                        var rigidbody = cubeObject.AddComponent<Rigidbody>();
-                        rigidbody.useGravity = false;
-                        rigidbody.isKinematic = false;
-                        rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                        cubeObject.AddComponent<BoxCollider>();
-                    } else if (i == 1 && j == 2 && h == 4) {
-                        var endHitbox = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        endHitbox.transform.position = new Vector3(i, j, h);
-                        endHitbox.transform.parent = mazeObject.transform;
-                        // Remove the color in the future
-                        endHitbox.GetComponent<Renderer>().material.color = new Color(255, 0, 0);
-                        var rigidbody = endHitbox.AddComponent<Rigidbody>();
-                        rigidbody.useGravity = false;
-                        rigidbody.isKinematic = false;
-                        rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                        var boxCollider = endHitbox.AddComponent<BoxCollider>();
-                        boxCollider.isTrigger = true;
-                        endHitbox.tag = "End";
+                        SpawnCube(i, j, h, mazeObject, cubePrefab);
                     }
                 }
             }
         }
-        user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
+       
+        SpawnCube(entrance.Item1, entrance.Item2, entrance.Item3, mazeObject, cubePrefab);
+        SpawnCube(exit.Item1, exit.Item2, exit.Item3, mazeObject, cubePrefab);
+
+        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        exitArea.name = "End";
+        exitArea.transform.position = new Vector3(exit.Item1, exit.Item2 + 0.5f, exit.Item3);
+        exitArea.transform.localScale = new Vector3(1, 0.5f, 1);
+        exitArea.transform.parent = mazeObject.transform;
+        var render = exitArea.GetComponent<Renderer>();
+        render.material = (Material)Resources.Load("Materials/transparentBlack");
+        var collider = exitArea.GetComponent<Collider>();
+        collider.isTrigger = true;
+        collider.tag = "End";
+
+        user.transform.position = new Vector3(entrance.Item1, entrance.Item2 + 1, entrance.Item3);
     }
 
     // Update is called once per frame
     void Update()
     {
         
-    }
-
-    private void OnTriggerEnter(Collider other) {
-        if(other.gameObject.tag == "End") {
-            gameParams.curLevel++;
-        }
     }
 
     private bool[,,] GetMaze()
@@ -90,13 +78,25 @@ public class WorldScript : MonoBehaviour
         return maze;
     }
 
+    private GameObject SpawnCube(int x, int y, int z, GameObject mazeObject, UnityEngine.Object cubePrefab) 
+    {
+        var cubeObject = (GameObject)Instantiate(cubePrefab, new Vector3(x, y, z), Quaternion.identity);
+        cubeObject.transform.parent = mazeObject.transform;
+        var rigidbody = cubeObject.AddComponent<Rigidbody>();
+        rigidbody.useGravity = false;
+        rigidbody.isKinematic = false;
+        rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        cubeObject.AddComponent<BoxCollider>();
+        return cubeObject;
+    }
+
     private Tuple<int, int, int> GetEntrance()
     {
-        return new Tuple<int, int, int>( 1, 1, 0 );
+        return new Tuple<int, int, int>( 1, 0, -1 );
     }
 
     private Tuple<int, int, int> GetExit()
     {
-        return new Tuple<int, int, int>(1, 1, 0);
+        return new Tuple<int, int, int>(1, 1, 5);
     }
 }
