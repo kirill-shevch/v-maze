@@ -11,18 +11,53 @@ public class UserControl : MonoBehaviour
     Quaternion headRotation;
     GameObject maze;
     GameObject user;
+    bool endTriggered = false;
+    float timer = 3f;
+
+    private Rigidbody rigidbody;
+
+    private Vector3 velocity, desiredVelocity;
+
+    private float maxSpeed = 1.0f;
 
     // Start is called before the first frame update
     void Start()
     {
         maze = GameObject.Find("maze");
         user = GameObject.Find("XR Origin");
+        rigidbody = user.GetComponent<Rigidbody>();
+    }
+
+
+    void FixedUpdate()
+    {
+        // Retrieve previous state.
+        velocity = rigidbody.velocity;
+
+        velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, 1.0f);
+        velocity.z = Mathf.MoveTowards(velocity.z, desiredVelocity.z, 1.0f);
+
+        rigidbody.velocity = velocity;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (endTriggered)
+        {
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+            {
+                Application.Quit();
+            }
+        }
+        
+        Vector2 playerInput;
+        playerInput.x = Input.GetAxis("Horizontal");
+        playerInput.y = Input.GetAxis("Vertical");
+        playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+        
         //maze.transform.RotateAround(user.transform.position, new Vector3(
         //    Mathf.Cos(user.transform.rotation.eulerAngles.y * Mathf.Deg2Rad), 
         //    0,
@@ -36,9 +71,9 @@ public class UserControl : MonoBehaviour
             if (primary2DAxis.y != 0)
             {
                 maze.transform.RotateAround(user.transform.position, new Vector3(
-                    Mathf.Cos(headRotation.eulerAngles.y * Mathf.Deg2Rad),
-                    0,
-                    -Mathf.Sin(headRotation.eulerAngles.y * Mathf.Deg2Rad)),
+                        Mathf.Cos(headRotation.eulerAngles.y * Mathf.Deg2Rad),
+                        0,
+                        -Mathf.Sin(headRotation.eulerAngles.y * Mathf.Deg2Rad)),
                     primary2DAxis.y);
             }
         }
@@ -50,6 +85,7 @@ public class UserControl : MonoBehaviour
                 InputDevices.GetDevicesAtXRNode(UnityEngine.XR.XRNode.RightHand, rightHandDevices);
                 rdevice = rightHandDevices.FirstOrDefault();
             }
+
             if (!head.isValid)
             {
                 var headDevices = new List<UnityEngine.XR.InputDevice>();
@@ -57,9 +93,21 @@ public class UserControl : MonoBehaviour
                 head = headDevices.FirstOrDefault();
             }
         }
+
         if (maze == null)
         {
             maze = GameObject.Find("maze");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "End")
+        {
+            endTriggered = true;
+            other.enabled = false;
+            other.gameObject.SetActive(false);
+            user.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         }
     }
 }

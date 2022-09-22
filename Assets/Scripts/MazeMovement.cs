@@ -1,11 +1,14 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+
 public class MazeMovement : MonoBehaviour
 {
     GameObject playerCamera;
+
     InputDevice device;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -14,11 +17,12 @@ public class MazeMovement : MonoBehaviour
         var rightHandDevices = new List<UnityEngine.XR.InputDevice>();
         InputDevices.GetDevicesAtXRNode(UnityEngine.XR.XRNode.RightHand, rightHandDevices);
 
-        if(rightHandDevices.Count == 1)
+        if (rightHandDevices.Count == 1)
         {
             device = rightHandDevices[0];
             Debug.Log("device found!");
-        } else
+        }
+        else
         {
             Debug.Log("device not found");
         }
@@ -36,12 +40,11 @@ public class MazeMovement : MonoBehaviour
         }*/
         Vector2 axisValue;
 
-        if(device.TryGetFeatureValue(CommonUsages.secondary2DAxis, out axisValue)) {
+        if (device.TryGetFeatureValue(CommonUsages.secondary2DAxis, out axisValue))
+        {
             Debug.Log(axisValue[0] + " " + axisValue[1]);
             gameObject.transform.RotateAround(playerCamera.transform.position, Vector3.up, axisValue[0]);
             gameObject.transform.RotateAround(playerCamera.transform.position, Vector3.left, axisValue[1]);
         }
-
-
     }
 }
