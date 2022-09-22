@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Transactions;
 
 public class WorldScript : MonoBehaviour
 {
     GameObject user;
+    int maze_width = 12;
+    int maze_height = 12;
+    int maze_depth = 12;
 
     [SerializeField] private Boolean isClosed = true;
 
@@ -195,6 +196,7 @@ public class WorldScript : MonoBehaviour
 
         return rst;
     }
+
     private bool[,,] MazeToBool(Room[] maze, int width, int height, int depth)
     {
         var bool_maze = new bool[width, height, depth];
@@ -224,9 +226,7 @@ public class WorldScript : MonoBehaviour
         }
         return bool_maze;
     }
-    int maze_width = 19;
-    int maze_height = 40;
-    int maze_depth = 12;
+
 
     private bool[,,] GetMaze()
     {
@@ -298,6 +298,6 @@ public class WorldScript : MonoBehaviour
 
     private Tuple<int, int, int> GetExit()
     {
-        return new Tuple<int, int, int>(1, 1, 5);
+        return new Tuple<int, int, int>(maze_width - 2, maze_height - 2, maze_depth);
     }
 }
