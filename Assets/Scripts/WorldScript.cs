@@ -15,13 +15,19 @@ public class WorldScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var Rand = new System.Random();
         user = GameObject.Find("XR Origin");
         var entrance = GetEntrance();
         var exit = this.GetExit();
         var maze = GetMaze();
         var middleCoordinates = new Tuple<float, float, float>((float)maze.GetLength(0) / 2,
             (float)maze.GetLength(1) / 2, (float)maze.GetLength(2) / 2);
-        var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1");
+        // var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1");
+        var cubePrefab0 = Resources.Load("Prefabs/dungeon/dungeon_block_0");
+        var cubePrefab1 = Resources.Load("Prefabs/dungeon/dungeon_block_1");
+        //var[] cubePrefabs = new var[2];
+        //cubePrefabs.Concat(cubePrefab0);
+        //cubePrefabs.Concat(cubePrefab1);
         var mazeObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         mazeObject.transform.position =
             new Vector3(middleCoordinates.Item1, middleCoordinates.Item2, middleCoordinates.Item3);
@@ -36,14 +42,18 @@ public class WorldScript : MonoBehaviour
                 {
                     if (maze[i, j, h])
                     {
-                        SpawnCube(i, j, h, mazeObject, cubePrefab);
+                        int randVal = Rand.Next(2);
+                        if (randVal == 1)
+                            SpawnCube(i, j, h, mazeObject, cubePrefab0);
+                        else
+                            SpawnCube(i, j, h, mazeObject, cubePrefab1);
                     }
                 }
             }
         }
 
-        SpawnCube(entrance.Item1, entrance.Item2, entrance.Item3, mazeObject, cubePrefab);
-        SpawnCube(exit.Item1, exit.Item2, exit.Item3, mazeObject, cubePrefab);
+        SpawnCube(entrance.Item1, entrance.Item2, entrance.Item3, mazeObject, cubePrefab0);
+        SpawnCube(exit.Item1, exit.Item2, exit.Item3, mazeObject, cubePrefab1);
 
         var exitArea = GameObject.CreatePrimitive(PrimitiveType.Cube);
         exitArea.name = "End";
