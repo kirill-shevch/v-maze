@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR;
 
 public class UserControl : MonoBehaviour
@@ -48,7 +49,8 @@ public class UserControl : MonoBehaviour
             timer -= Time.deltaTime;
             if (timer <= 0f)
             {
-                Application.Quit();
+                SceneManager.LoadScene("MovementScene");
+                endTriggered = false;
             }
         }
         

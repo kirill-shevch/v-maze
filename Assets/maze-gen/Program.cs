@@ -12,29 +12,29 @@ using System.Transactions;
 
 public class Point3D
 {
-    public int _x;
-    public int _y;
-    public int _z;
+    public int X;
+    public int Y;
+    public int Z;
 
     public Point3D(int x, int y, int z)
     {
-        this._x = x;
-        this._y = y;
-        this._z = z;
+        this.X = x;
+        this.Y = y;
+        this.Z = z;
     }
-    
+
     public double euclidianDistanceTo(Point3D dest)
     {
-        int x = this._x - dest._x;
-        int y = this._y - dest._y;
-        int z = this._z - dest._z;
+        int x = this.X - dest.X;
+        int y = this.Y - dest.Y;
+        int z = this.Z - dest.Z;
 
         return Math.Pow(x * x + y * y + z * z, 0.5);
     }
 
     public bool isLinkingSegmentDiagonal(Point3D dest)
     {
-        return !((this._x == dest._x && this._y == dest._y) || (this._x == dest._x && this._z == dest._z) || (this._y == dest._y && this._z == dest._z));
+        return !((this.X == dest.X && this.Y == dest.Y) || (this.X == dest.X && this.Z == dest.Z) || (this.Y == dest.Y && this.Z == dest.Z));
     }
 }
 
