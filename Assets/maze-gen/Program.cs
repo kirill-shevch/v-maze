@@ -115,7 +115,6 @@ Room[] create_corridors(Room[] rooms)
     return cor.ToArray();
 }
 
-// TODO: this function is not finished
 List<Room> create_corridors_between_rooms(Room ori, Room dst)
 {
     List<Room> rst = new List<Room>();
@@ -142,9 +141,8 @@ List<Room> create_corridors_between_rooms(Room ori, Room dst)
     // create the corridor(s)
     bool is_diagonal = false;
 
-    // TODO: see how many 90º angles the corridor should have
-    // TODO: put the 1-2 angles within the 2nd third of the corridor
-    // TODO: a (part of a) corridor is a Room having two of the w/h/d set to 1 and the last variable
+
+
 
     return rst;
 }
@@ -248,18 +246,21 @@ public class Room
     public int _h;
     public int _d;
 
+    int _padding;
+
     Container _cnt;
 
     public Room(Container content, int padding = 3)
     {
-        this._x = content._x + content._w / padding;
-        this._y = content._y + content._h / padding;
-        this._z = content._z + content._d / padding;
+        this._x = content._x;
+        this._y = content._y;
+        this._z = content._z;
 
-        this._w = content._w - (this._x - content._x) - content._w / padding;
-        this._h = content._h - (this._y - content._y) - content._h / padding;
-        this._d = content._d - (this._z - content._z) - content._d / padding;
+        this._w = 2 * content._w / padding;
+        this._h = 2 * content._h / padding;
+        this._d = 2 * content._d / padding;
 
+        this._padding = padding;
         this._cnt = content;
     }
 
@@ -285,7 +286,11 @@ public class Room
 
     public Point3D center()
     {
-        return new Point3D(this._x, this._y, this._z);
+        return new Point3D(
+            this._content._x + this._content._w / this._padding, 
+            this._content._y + this._content._h / this._padding, 
+            this._content._z + this._content._d / this._padding)
+        ;
     }
 
     public Point3D[] face(int n)
