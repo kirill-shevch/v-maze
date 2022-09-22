@@ -7,9 +7,9 @@ using UnityEngine.SceneManagement;
 public class WorldScript : MonoBehaviour
 {
     GameObject user;
-    int maze_width = 12;
-    int maze_height = 12;
-    int maze_depth = 12;
+    int maze_width = 8;
+    int maze_height = 8;
+    int maze_depth = 8;
 
     [SerializeField] private Boolean isClosed = true;
 
@@ -43,12 +43,12 @@ public class WorldScript : MonoBehaviour
             }
         }
 
-        SpawnCube(entrance.Item1, entrance.Item2, entrance.Item3, mazeObject, cubePrefab);
-        SpawnCube(exit.Item1, exit.Item2, exit.Item3, mazeObject, cubePrefab);
+        SpawnCube(entrance.X, entrance.Y, entrance.Z, mazeObject, cubePrefab);
+        SpawnCube(exit.X, exit.Y, exit.Z, mazeObject, cubePrefab);
 
         var exitArea = GameObject.CreatePrimitive(PrimitiveType.Cube);
         exitArea.name = "End";
-        exitArea.transform.position = new Vector3(exit.Item1, exit.Item2 + 0.5f, exit.Item3);
+        exitArea.transform.position = new Vector3(exit.X, exit.Y + 0.5f, exit.Z);
         exitArea.transform.localScale = new Vector3(1, 0.5f, 1);
         exitArea.transform.parent = mazeObject.transform;
         var render = exitArea.GetComponent<Renderer>();
@@ -57,7 +57,7 @@ public class WorldScript : MonoBehaviour
         collider.isTrigger = true;
         collider.tag = "End";
 
-        user.transform.position = new Vector3(entrance.Item1, entrance.Item2 + 1, entrance.Item3);
+        user.transform.position = new Vector3(entrance.X, entrance.Y + 1, entrance.Z);
         // user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
     }
 
@@ -99,7 +99,7 @@ public class WorldScript : MonoBehaviour
             r1_ratio = 1.0 * Containers[1]._w / Containers[1]._h;
         }
 
-        if (discard_by_ratio && (r0_ratio < ratio || r1_ratio < ratio))
+        if (discard_by_ratio && (r0_ratio < ratio || r1_ratio < ratio) && Container._x < 4 && Container._y < 4 && Container._z < 4)
         {
             Containers = split_Container_random(Container, gen, discard_by_ratio, ratio);
         }
@@ -272,11 +272,68 @@ public class WorldScript : MonoBehaviour
 
         Room[] maze = populate_dungeon(dd);
 
-        foreach(Room rr in maze)
+        //foreach(Room rr in maze)
+        //{
+        //    rr.print();
+        //}
+
+        var boolMaze = MazeToBool(maze, maze_width, maze_height, maze_depth);
+        SpawnCoridors(boolMaze);
+        return boolMaze;
+    }
+
+    private void SpawnCoridors(bool[,,] maze)
+    {
+        var currentPoint = GetEntrance();
+        var endpoint = GetExit();
+        currentPoint.Y++;
+        currentPoint.Z++;
+        endpoint.Y++;
+        endpoint.Z--;
+        System.Random randGen = new System.Random();
+        maze[currentPoint.X, currentPoint.Y, currentPoint.Z] = false;
+        while (true)
         {
-            rr.print();
+            var direction = randGen.Next(0, 3);
+            var length = randGen.Next(1, 4);
+            for (int i = 0; i < length; i++)
+            {
+                switch (direction)
+                {
+                    case 0:
+                        {
+                            if (currentPoint.X < endpoint.X)
+                            {
+                                currentPoint.X++;
+                            }
+                            break;
+                        }
+                    case 1:
+                        {
+                            if (currentPoint.Y < endpoint.Y)
+                            {
+                                currentPoint.Y++;
+                            }
+                            break;
+                        }
+                    case 2:
+                        {
+                            if (currentPoint.Z < endpoint.Z)
+                            {
+                                currentPoint.Z++;
+                            }
+                            break;
+                        }
+                    default:
+                        break;
+                }
+                maze[currentPoint.X, currentPoint.Y, currentPoint.Z] = false;
+                if (currentPoint.X == endpoint.X && currentPoint.Y == endpoint.Y && currentPoint.Z == endpoint.Z)
+                {
+                    return;
+                }
+            }
         }
-        return MazeToBool(maze, maze_width, maze_height, maze_depth);
     }
 
     private GameObject SpawnCube(int x, int y, int z, GameObject mazeObject, UnityEngine.Object cubePrefab)
@@ -291,13 +348,13 @@ public class WorldScript : MonoBehaviour
         return cubeObject;
     }
 
-    private Tuple<int, int, int> GetEntrance()
+    private Point3D GetEntrance()
     {
-        return new Tuple<int, int, int>(1, 0, -1);
+        return new Point3D(1, 0, -1);
     }
 
-    private Tuple<int, int, int> GetExit()
+    private Point3D GetExit()
     {
-        return new Tuple<int, int, int>(maze_width - 2, maze_height - 2, maze_depth);
+        return new Point3D(maze_width - 2, maze_height - 2, maze_depth);
     }
 }
