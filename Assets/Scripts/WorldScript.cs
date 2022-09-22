@@ -8,6 +8,7 @@ public class WorldScript : MonoBehaviour
 
     [SerializeField] private Boolean isClosed = true;
 
+
     // Start is called before the first frame update
     void Start()
     {
