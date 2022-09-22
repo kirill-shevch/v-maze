@@ -1,19 +1,23 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.XR;
 using Vector3 = UnityEngine.Vector3;
 
 public class FireScript : MonoBehaviour
 {
-    private GameObject player;
+    private GameObject torch;
     private GameObject user;
     private ParticleSystem emitter1;
     private ParticleSystem emitter2;
     private Rigidbody rigidbody;
+    InputDevice ldevice;
 
     private bool isColliding = false;
 
     [SerializeField] private Vector3 translation;
-    [SerializeField] private float scale = 1.0f;
+    [SerializeField] private float scale = 5.0f;
     [SerializeField] private float distance;
 
     [SerializeField] private float particlesVelocityScaling = 0.8f;
@@ -21,7 +25,7 @@ public class FireScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.Find("Torch");
+        torch = GameObject.Find("Torch");
         user = GameObject.Find("XR Origin");
         emitter1 = GameObject.Find("FireAdd").GetComponent<ParticleSystem>();
         emitter2 = GameObject.Find("FireMain").GetComponent<ParticleSystem>();
@@ -34,8 +38,23 @@ public class FireScript : MonoBehaviour
         UpdateEmitter(emitter1);
         UpdateEmitter(emitter2);
 
-        player.transform.position = user.transform.position + user.transform.forward * distance + translation;
-        player.transform.localScale = Vector3.one * scale;
+        if (!ldevice.isValid)
+        {
+            var rightHandDevices = new List<UnityEngine.XR.InputDevice>();
+            InputDevices.GetDevicesAtXRNode(UnityEngine.XR.XRNode.LeftHand, rightHandDevices);
+            ldevice = rightHandDevices.FirstOrDefault();
+        }
+        else
+        {
+            Vector3 position;
+            Quaternion rotation;
+            ldevice.TryGetFeatureValue(CommonUsages.devicePosition, out position);
+            ldevice.TryGetFeatureValue(CommonUsages.deviceRotation, out rotation);
+            torch.transform.position = user.transform.position + position + translation;
+            torch.transform.rotation = rotation;
+        }
+
+        torch.transform.localScale = Vector3.one * scale;
     }
 
     void UpdateEmitter(ParticleSystem emitter)
