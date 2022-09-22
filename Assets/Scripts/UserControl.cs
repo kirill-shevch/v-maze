@@ -57,12 +57,6 @@ public class UserControl : MonoBehaviour
         playerInput.y = Input.GetAxis("Vertical");
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-        
-        //maze.transform.RotateAround(user.transform.position, new Vector3(
-        //    Mathf.Cos(user.transform.rotation.eulerAngles.y * Mathf.Deg2Rad), 
-        //    0,
-        //    -Mathf.Sin(user.transform.rotation.eulerAngles.y * Mathf.Deg2Rad)), 
-        //    0.1f);
 
         if (rdevice.isValid && head.isValid)
         {

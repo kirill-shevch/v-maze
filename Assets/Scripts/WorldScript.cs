@@ -8,6 +8,7 @@ public class WorldScript : MonoBehaviour
 
     [SerializeField] private Boolean isClosed = true;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -85,14 +86,6 @@ public class WorldScript : MonoBehaviour
         maze[1, 2, 2] = false;
         maze[1, 2, 3] = false;
         maze[1, 2, 4] = false;
-
-        // Optionally close the entrance, exist to simulate lightning in closed env.
-        // if (!isClosed)
-        // {
-        //     maze[1, 1, 0] = false;
-        //     maze[1, 2, 4] = false;
-        // }
-
         return maze;
     }
 
