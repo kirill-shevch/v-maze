@@ -58,7 +58,7 @@ public class GhostSript : MonoBehaviour
             target = new Vector3(user.transform.position.x, user.transform.position.y, user.transform.position.z);
         }
 
-        if (!endTriggered && Vector3.Distance(user.transform.position, ghost.transform.position) < 1f)
+        if (!endTriggered && Vector3.Distance(user.transform.position, ghost.transform.position) < 1.3f)
         {
             endTriggered = true;
             flying.PlayOneShot(Resources.Load<AudioClip>("Sounds/Death"));
