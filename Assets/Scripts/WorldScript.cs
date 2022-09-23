@@ -6,10 +6,8 @@ public class WorldScript : MonoBehaviour
 {
     GameObject user;
     public static int maze_width = 8;
-    public static int maze_height = 8;
+    public static int maze_height = 6;
     public static int maze_depth = 8;
-
-    [SerializeField] private Boolean isClosed = true;
 
     void Start()
     {
@@ -49,13 +47,12 @@ public class WorldScript : MonoBehaviour
         SpawnCube(entrance.X, entrance.Y, entrance.Z, mazeObject, cubePrefab0);
         SpawnCube(exit.X, exit.Y, exit.Z, mazeObject, cubePrefab1);
         SpawnExit(exit, mazeObject);
-
         user.transform.position = new Vector3(entrance.X, entrance.Y + 1, entrance.Z);
     }
 
     private void SpawnExit(Point3D exit, GameObject mazeObject)
     {
-        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Cube);
         exitArea.name = "End";
         exitArea.transform.position = new Vector3(exit.X, exit.Y + 0.5f, exit.Z);
         exitArea.transform.localScale = new Vector3(1, 0.5f, 1);

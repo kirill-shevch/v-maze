@@ -6,7 +6,7 @@ public class GhostSript : MonoBehaviour
     GameObject user;
     GameObject ghost;
     Vector3 target;
-    public float speed = 0.2f;
+    public float speed = 1f;
     bool freeze = true;
     float freezeTime = 20f;
     AudioSource flying;
@@ -40,13 +40,13 @@ public class GhostSript : MonoBehaviour
             if (freezeTime <= 0f)
             {
                 freeze = false;
-                freezeTime = 13f;
+                freezeTime = 16f;
                 flying.Play();
             }
         }
         else
         {
-            var step = speed * Time.deltaTime; // calculate distance to move
+            var step = speed;// * Time.deltaTime; // calculate distance to move
             ghost.transform.position = Vector3.MoveTowards(ghost.transform.position, target, step);
         }
 
