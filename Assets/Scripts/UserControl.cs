@@ -100,9 +100,10 @@ public class UserControl : MonoBehaviour
     {
         if (other.tag == "End")
         {
+            other.gameObject.GetComponent<AudioSource>().Play();
             endTriggered = true;
-            other.enabled = false;
-            other.gameObject.SetActive(false);
+            //other.enabled = false;
+            //other.gameObject.SetActive(false);
             user.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         }
     }
