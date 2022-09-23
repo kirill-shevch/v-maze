@@ -53,20 +53,26 @@ public class WorldScript : MonoBehaviour
 
         SpawnCube(entrance.X, entrance.Y, entrance.Z, mazeObject, cubePrefab0);
         SpawnCube(exit.X, exit.Y, exit.Z, mazeObject, cubePrefab1);
+        SpawnExit(exit, mazeObject);
 
-        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        user.transform.position = new Vector3(entrance.X, entrance.Y + 1, entrance.Z);
+        // user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
+    }
+
+    private void SpawnExit(Point3D exit, GameObject mazeObject)
+    {
+        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         exitArea.name = "End";
         exitArea.transform.position = new Vector3(exit.X, exit.Y + 0.5f, exit.Z);
         exitArea.transform.localScale = new Vector3(1, 0.5f, 1);
         exitArea.transform.parent = mazeObject.transform;
         var render = exitArea.GetComponent<Renderer>();
-        render.material = (Material)Resources.Load("Materials/transparentBlack");
+        render.material = (Material)Resources.Load("Materials/Effect_03");
         var collider = exitArea.GetComponent<Collider>();
         collider.isTrigger = true;
         collider.tag = "End";
-
-        user.transform.position = new Vector3(entrance.X, entrance.Y + 1, entrance.Z);
-        // user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
+        var audioSource = exitArea.AddComponent<AudioSource>();
+        audioSource.clip = Resources.Load<AudioClip>("Sounds/Teleport-exit");
     }
 
     // Update is called once per frame
