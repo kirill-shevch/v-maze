@@ -12,6 +12,8 @@ public class UserControl : MonoBehaviour
     Quaternion headRotation;
     GameObject maze;
     GameObject user;
+    AudioSource rotating;
+    AudioSource walking;
     bool endTriggered = false;
     float timer = 3f;
 
@@ -27,6 +29,10 @@ public class UserControl : MonoBehaviour
         maze = GameObject.Find("maze");
         user = GameObject.Find("XR Origin");
         rigidbody = user.GetComponent<Rigidbody>();
+        rotating = user.AddComponent<AudioSource>();
+        rotating.clip = Resources.Load<AudioClip>("Sounds/Scraping Stone Cut");
+        walking = user.AddComponent<AudioSource>();
+        walking.clip = Resources.Load<AudioClip>("Sounds/Stone steps");
     }
 
 
@@ -66,11 +72,36 @@ public class UserControl : MonoBehaviour
             head.TryGetFeatureValue(CommonUsages.deviceRotation, out headRotation);
             if (primary2DAxis.y != 0)
             {
+                if (!rotating.isPlaying)
+                {
+                    rotating.Play();
+                }
                 maze.transform.RotateAround(user.transform.position, new Vector3(
                         Mathf.Cos(headRotation.eulerAngles.y * Mathf.Deg2Rad),
                         0,
                         -Mathf.Sin(headRotation.eulerAngles.y * Mathf.Deg2Rad)),
                     primary2DAxis.y);
+            }
+            else
+            {
+                if (rotating.isPlaying)
+                {
+                    rotating.Stop();
+                }
+            }
+            if (playerInput.x != 0 || playerInput.y != 0)
+            {
+                if (!walking.isPlaying)
+                {
+                    walking.Play();
+                }
+            }
+            else
+            {
+                if (walking.isPlaying)
+                {
+                    walking.Stop();
+                }
             }
         }
         else
