@@ -5,13 +5,10 @@ using UnityEngine.SceneManagement;
 public class WorldScript : MonoBehaviour
 {
     GameObject user;
-    int maze_width = 8;
-    int maze_height = 8;
-    int maze_depth = 8;
+    public static int maze_width = 8;
+    public static int maze_height = 6;
+    public static int maze_depth = 8;
 
-    [SerializeField] private Boolean isClosed = true;
-
-    // Start is called before the first frame update
     void Start()
     {
         var Rand = new System.Random();
@@ -21,12 +18,8 @@ public class WorldScript : MonoBehaviour
         var maze = GetMaze();
         var middleCoordinates = new Tuple<float, float, float>((float)maze.GetLength(0) / 2,
             (float)maze.GetLength(1) / 2, (float)maze.GetLength(2) / 2);
-        // var cubePrefab = Resources.Load("Prefabs/block_brick_brown_1");
         var cubePrefab0 = Resources.Load("Prefabs/dungeon/dungeon_block_0");
         var cubePrefab1 = Resources.Load("Prefabs/dungeon/dungeon_block_1");
-        //var[] cubePrefabs = new var[2];
-        //cubePrefabs.Concat(cubePrefab0);
-        //cubePrefabs.Concat(cubePrefab1);
         var mazeObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         mazeObject.transform.position =
             new Vector3(middleCoordinates.Item1, middleCoordinates.Item2, middleCoordinates.Item3);
@@ -54,14 +47,12 @@ public class WorldScript : MonoBehaviour
         SpawnCube(entrance.X, entrance.Y, entrance.Z, mazeObject, cubePrefab0);
         SpawnCube(exit.X, exit.Y, exit.Z, mazeObject, cubePrefab1);
         SpawnExit(exit, mazeObject);
-
         user.transform.position = new Vector3(entrance.X, entrance.Y + 1, entrance.Z);
-        // user.transform.position = new Vector3(entrance.Item1, entrance.Item2, entrance.Item3);
     }
 
     private void SpawnExit(Point3D exit, GameObject mazeObject)
     {
-        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        var exitArea = GameObject.CreatePrimitive(PrimitiveType.Cube);
         exitArea.name = "End";
         exitArea.transform.position = new Vector3(exit.X, exit.Y + 0.5f, exit.Z);
         exitArea.transform.localScale = new Vector3(1, 0.5f, 1);
