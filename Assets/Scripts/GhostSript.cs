@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GhostSript : MonoBehaviour
 {
@@ -9,7 +10,8 @@ public class GhostSript : MonoBehaviour
     bool freeze = true;
     float freezeTime = 20f;
     AudioSource flying;
-
+    bool endTriggered = false;
+    float endTime = 1.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +32,8 @@ public class GhostSript : MonoBehaviour
     {
         ghost.transform.LookAt(user.transform);
         ghost.transform.Rotate(new Vector3(-90, 0, 0));
-       
+
+
         if (freeze)
         {
             freezeTime -= Time.deltaTime;
@@ -53,6 +56,22 @@ public class GhostSript : MonoBehaviour
             freeze = true;
             // Swap the position of the cylinder.
             target = new Vector3(user.transform.position.x, user.transform.position.y, user.transform.position.z);
+        }
+
+        if (!endTriggered && Vector3.Distance(user.transform.position, ghost.transform.position) < 1f)
+        {
+            endTriggered = true;
+            flying.PlayOneShot(Resources.Load<AudioClip>("Sounds/Death"));
+        }
+
+        if (endTriggered)
+        {
+            endTime -= Time.deltaTime;
+            if (endTime <= 0f)
+            {
+                SceneManager.LoadScene("MovementScene");
+                endTriggered = false;
+            }
         }
     }
 }
