@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -80,177 +78,19 @@ public class WorldScript : MonoBehaviour
         }
     }
 
-    Container[] split_Container_random(Container Container, System.Random gen, bool discard_by_ratio, double ratio)
-    {
-        Container[] Containers = new Container[2];
-        int side = gen.Next(3);
-        double r0_ratio = 0;
-        double r1_ratio = 0;
-        if (side == 0) // x-axis
-        {
-            Containers[0] = new Container(Container._x, Container._y, Container._z, gen.Next(Container._w), Container._h, Container._d);
-            Containers[1] = new Container(Container._x + Containers[0]._w, Container._y, Container._z, Container._w - Containers[0]._w, Container._h, Container._d);
-            r0_ratio = 1.0 * Containers[0]._w / Containers[0]._h;
-            r1_ratio = 1.0 * Containers[1]._w / Containers[1]._h;
-
-        }
-        else if (side == 1) // y-axis
-        {
-            Containers[0] = new Container(Container._x, Container._y, Container._z, Container._w, gen.Next(Container._h), Container._d);
-            Containers[1] = new Container(Container._x, Container._y + Containers[0]._h, Container._z, Container._w, Container._h - Containers[0]._h, Container._d);
-            r0_ratio = 1.0 * Containers[0]._w / Containers[0]._h;
-            r1_ratio = 1.0 * Containers[1]._w / Containers[1]._h;
-        }
-        else // z-axis
-        {
-            Containers[0] = new Container(Container._x, Container._y, Container._z, Container._w, Container._h, gen.Next(Container._d));
-            Containers[1] = new Container(Container._x, Container._y, Container._z + Containers[0]._d, Container._w, Container._h, Container._d - Containers[0]._d);
-            r0_ratio = 1.0 * Containers[0]._w / Containers[0]._h;
-            r1_ratio = 1.0 * Containers[1]._w / Containers[1]._h;
-        }
-
-        if (discard_by_ratio && (r0_ratio < ratio || r1_ratio < ratio) && Container._x < 4 && Container._y < 4 && Container._z < 4)
-        {
-            Containers = split_Container_random(Container, gen, discard_by_ratio, ratio);
-        }
-        return Containers;
-    }
-
-    MazeLeaf grow_dungeon(Container Container, int iter, System.Random gen, bool discard_by_ratio, double ratio)
-    {
-        MazeLeaf root = new MazeLeaf(Container);
-        if(iter > 0)
-        {
-            Container[] split = split_Container_random(Container, gen, discard_by_ratio, ratio);
-            root._r = grow_dungeon(split[0], iter - 1, gen, discard_by_ratio, ratio);
-            root._l = grow_dungeon(split[1], iter - 1, gen, discard_by_ratio, ratio);
-        }
-        return root;
-    }
-
-    Room[] populate_dungeon(List<MazeLeaf> maze)
-    {
-        Room[] rooms = new Room[maze.Count];
-        for(int ii = 0; ii < maze.Count; ii++)
-        {
-            rooms[ii] = new Room(maze[ii]._c, 5);
-        }
-
-        Room[] corridors = create_corridors(rooms);
-
-        return rooms.Concat(corridors).ToArray();
-    }
-
-    Room[] create_corridors(Room[] rooms)
-    {
-        List<Room> cpy = rooms.ToList();
-        List<Room> cor = new List<Room>();
-
-        Room ori = cpy.First();
-        while (cpy.Count > 0)
-        {
-            double[] d = new double[cpy.Count];
-            for (int ii = 0; ii < cpy.Count; ii++)
-            {
-
-                d[ii] = ori.center().euclidianDistanceTo(cpy[ii].center());
-            }
-
-            int dst_idx = Array.IndexOf(d, d.Min());
-            Room dst = cpy.ElementAt(dst_idx);
-            cpy.RemoveAt(dst_idx);
-
-            cor.Concat(create_corridors_between_rooms(ori, dst)).ToList();
-        }
-
-        return cor.ToArray();
-    }
-
-    // TODO: this function is not finished
-    List<Room> create_corridors_between_rooms(Room ori, Room dst)
-    {
-        List<Room> rst = new List<Room>();
-
-        // get the closest walls
-        int[] face_1 = new int[6];
-        for(int ii = 0; ii < 6; ii++)
-        {
-            double[] dist_2 = new double[6];
-            for (int jj = 0; jj < 6; jj++)
-            {
-                dist_2[jj] = ori.face_center(ii).euclidianDistanceTo(dst.face_center(jj));
-            }
-            face_1[ii] = Array.IndexOf(dist_2, dist_2.Min());
-        }
-        double[] dist_1 = new double[6];
-        for(int ii = 0; ii < 6; ii++)
-        {
-            dist_1[ii] = ori.face_center(ii).euclidianDistanceTo(dst.face_center(face_1[ii]));
-        }
-        int ori_wall = Array.IndexOf(dist_1, dist_1.Min());
-        int dst_wall = face_1[ori_wall];
-
-        Point3D ori_face_central_point = ori.face_center(ori_wall);
-        Point3D dst_face_central_point = dst.face_center(dst_wall);
-
-        // create the corridor(s)
-        bool is_diagonal = ori_face_central_point.isLinkingSegmentDiagonal(dst_face_central_point);
-
-        //if (!is_diagonal)
-        //{
-        //    rst.Concat(Room())
-        //}
-        // TODO: see how many 90º angles the corridor should have
-        // TODO: put the 1-2 angles within the 2nd third of the corridor
-        // TODO: a (part of a) corridor is a Room having two of the w/h/d set to 1 and the last variable
-
-        return rst;
-    }
-
-    private bool[,,] MazeToBool(Room[] maze, int width, int height, int depth)
-    {
-        var bool_maze = new bool[width, height, depth];
-        for (int i = 0; i < bool_maze.GetLength(0); i++)
-        {
-            for (int j = 0; j < bool_maze.GetLength(1); j++)
-            {
-                for (int h = 0; h < bool_maze.GetLength(2); h++)
-                {
-                    bool_maze[i,j,h] = true;
-                }
-            }
-        }
-
-        foreach (Room room in maze)
-        {
-            for(int x = room._x; x < room._x + room._w; x++)
-            {
-                for(int y = room._y; y < room._y + room._h; y++)
-                {
-                    for(int z = room._z; z < room._z + room._d; z++)
-                    {
-                        bool_maze[x, y, z] = false;
-                    }
-                }
-            }
-        }
-        return bool_maze;
-    }
-
-
     private bool[,,] GetMaze()
     {
-        //var maze = new bool[3, 4, 5];
-        //for (int i = 0; i < maze.GetLength(0); i++)
-        //{
-        //    for (int j = 0; j < maze.GetLength(1); j++)
-        //    {
-        //        for (int h = 0; h < maze.GetLength(2); h++)
-        //        {
-        //            maze[i, j, h] = true;
-        //        }
-        //    }
-        //}
+        var maze = new bool[maze_width, maze_height, maze_depth];
+        for (int i = 0; i < maze.GetLength(0); i++)
+        {
+            for (int j = 0; j < maze.GetLength(1); j++)
+            {
+                for (int h = 0; h < maze.GetLength(2); h++)
+                {
+                    maze[i, j, h] = true;
+                }
+            }
+        }
 
         //maze[1, 1, 0] = false;
         //maze[1, 1, 1] = false;
@@ -268,28 +108,42 @@ public class WorldScript : MonoBehaviour
 
         // return maze
 
+
+        SpawnCoridors(maze);
+        SpawnRooms(maze);
+        return maze;
+    }
+
+    private void SpawnRooms(bool[,,] maze)
+    {
         System.Random randGen = new System.Random();
-        double _ratio = 0.45;
-        bool _discard_by_ratio = true;
+        var counter = 0;
+        while (true)
+        {
+            if (counter > (maze_width * maze_height * maze_depth) / 6)
+            {
+                return;
+            }
+            var size = randGen.Next(3, 5);
+            var x = randGen.Next(0, maze_width);
+            var y = randGen.Next(0, maze_height);
+            var z = randGen.Next(0, maze_depth);
+            for (int i = x; i < x + size; i++)
+            {
+                for (int j = y; j < y + size; j++)
+                {
+                    for (int k = z; k < z + size; k++)
+                    {
+                        if (i < maze_width && j < maze_height && k < maze_depth)
+                        {
+                            maze[i, j, k] = false;
+                            counter++;
+                        }
+                    }
+                }
+            }
 
-        int division_level = 4;
-
-        Container c = new Container(0, 0, 0, maze_width, maze_height, maze_depth);
-
-        MazeLeaf d = grow_dungeon(c, division_level, randGen, _discard_by_ratio, _ratio);
-
-        List<MazeLeaf> dd = d.get_level(division_level);
-
-        Room[] maze = populate_dungeon(dd);
-
-        //foreach(Room rr in maze)
-        //{
-        //    rr.print();
-        //}
-
-        var boolMaze = MazeToBool(maze, maze_width, maze_height, maze_depth);
-        SpawnCoridors(boolMaze);
-        return boolMaze;
+        }
     }
 
     private void SpawnCoridors(bool[,,] maze)
@@ -366,5 +220,19 @@ public class WorldScript : MonoBehaviour
     private Point3D GetExit()
     {
         return new Point3D(maze_width - 2, maze_height - 2, maze_depth);
+    }
+
+    private class Point3D
+    {
+        public int X;
+        public int Y;
+        public int Z;
+
+        public Point3D(int x, int y, int z)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
     }
 }
