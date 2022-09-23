@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 public class WorldScript : MonoBehaviour
 {
     GameObject user;
-    int maze_width = 8;
-    int maze_height = 8;
-    int maze_depth = 8;
+    public static int maze_width = 8;
+    public static int maze_height = 8;
+    public static int maze_depth = 8;
 
     [SerializeField] private Boolean isClosed = true;
 
